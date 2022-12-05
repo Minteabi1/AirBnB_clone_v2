@@ -8,25 +8,13 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self, cls=None):
+    def all(self):
         """Returns a dictionary of models currently in storage"""
-        if cls is not None:
-            if type(cls) == str:
-                cls = eval(cls)
-            new_dict = {}
-            for key, value in self.__objects.items():
-                # if self.__class__.__name__ == cls:
-                if type(value) == cls:
-                    new_dict[key] = value
-            return new_dict
-        else:
-            return self.__objects
+        return FileStorage.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        if obj:
-            key = "{}.{}".format(type(obj).__name__, obj.id)
-            self.__objects[key] = obj
+        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -57,18 +45,6 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+                        self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-
-    def delete(self, obj=None):
-        """Delete objects"""
-        if obj:
-            key = "{}.{}".format(type(obj).__name__, obj.id)
-            if self.__objects[key]:
-                del FileStorage.__objects[key]
-                self.save()
-
-    def close(self):
-        """Method for deserializing the JSON file to objects"""
-        self.reload()
