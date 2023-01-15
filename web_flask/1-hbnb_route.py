@@ -13,8 +13,8 @@ def hello():
     return 'Hello HBNB!'
 
 
-@app.route('/hbnb', strict_slashes=False)
-def hello():
+@app.route('/hbnb')
+def hello_hbnb():
     """hello Hbnb returns"""
     return 'HBNB'
 
