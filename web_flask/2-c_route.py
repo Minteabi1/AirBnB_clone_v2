@@ -22,7 +22,7 @@ def hello_hbnb():
 @app.route('/c/<text>')
 def clove(text):
     """C is Fun """
-    return f'{text.replace("_"," ")}'
+    return f'C {text.replace("_"," ")}'
 
 
 if __name__ == "__main__":
