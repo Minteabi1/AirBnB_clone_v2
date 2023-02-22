@@ -1,23 +1,42 @@
 #!/usr/bin/python3
-"""This is the user class"""
+""" holds class User"""
+import models
 from models.base_model import BaseModel, Base
-from sqlalchemy.orm import relationship
+from os import getenv
+import sqlalchemy
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+import hashlib
 
 
 class User(BaseModel, Base):
-    """This is the class for user
-    Attributes:
-        email: email address
-        password: password for you login
-        first_name: first name
-        last_name: last name
-    """
-    __tablename__ = 'users'
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=True)
-    last_name = Column(String(128), nullable=True)
+    """Representation of a user """
+    if models.storage_t == 'db':
+        __tablename__ = 'users'
+        h = hashlib.new('md5')
+        h.update(b"password")
+        email = Column(String(128), nullable=False)
+        _password = Column("password", String(128), nullable=False)
+        first_name = Column(String(128), nullable=True)
+        last_name = Column(String(128), nullable=True)
+        places = relationship("Place", backref="user")
+        reviews = relationship("Review", backref="user")
+    else:
+        email = ""
+        password = ""
+        first_name = ""
+        last_name = ""
 
-    places = relationship("Place", backref="user")
-    reviews = relationship("Review", backref="user")
+    def __init__(self, *args, **kwargs):
+        """initializes user"""
+        super().__init__(*args, **kwargs)
+
+    @property
+    def password(self):
+        """getter for password"""
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        """setter for password"""
+        self._password = hashlib.md5(value.encode()).hexdigest()
